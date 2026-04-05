@@ -184,7 +184,7 @@
   <script type="text/babel">
     const { useState, useEffect, useRef, useCallback } = React;
 
-    const APP_VERSION = "1.1.1";
+    const APP_VERSION = "1.2.0";
 
     // ─── URL Detection ───────────────────────────────────────
     function detectUrlType(url) {
@@ -201,69 +201,103 @@
       let prompt;
 
       if (type === "youtube") {
-        prompt = `I need you to get the transcript of this YouTube video. Use web_fetch to access the video page, then extract the complete transcript/captions text.
+        prompt = `Search for the full transcript of this YouTube video: ${url}
 
-Return ONLY a JSON object (no markdown, no backticks, no commentary) with these fields:
+Find and return the complete transcript text — every word spoken in the video. Search for "[video title] transcript" or "[video title] full text" to find it.
+
+Return ONLY a JSON object (no markdown, no backticks, no commentary before or after the JSON) with these fields:
 - "title": the video title
 - "author": the channel name
-- "content": the complete transcript text (all spoken words, cleaned up, no timestamps)
-- "duration": video duration if available
-
-URL: ${url}`;
+- "content": the complete transcript text (all spoken words, no timestamps)
+- "duration": video duration if available, otherwise null`;
       } else {
-        prompt = `Fetch this web page and extract the main article content. Remove all navigation, ads, sidebars, footers, cookie banners, and boilerplate. Keep only the actual article text.
+        prompt = `Search for and read the content of this web page: ${url}
 
-Return ONLY a JSON object (no markdown, no backticks, no commentary) with these fields:
+Find and extract the main article text. Remove all navigation, ads, sidebars, and boilerplate.
+
+Return ONLY a JSON object (no markdown, no backticks, no commentary before or after the JSON) with these fields:
 - "title": the article/page title
 - "author": the author name if available, otherwise null
 - "content": the full article text
-- "published": publication date if available, otherwise null
-
-URL: ${url}`;
+- "published": publication date if available, otherwise null`;
       }
 
-      const resp = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 16000,
-          tools: [{ type: "web_search_20250305", name: "web_search" }],
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
+      // First API call — Claude will use web_search tool
+      let messages = [{ role: "user", content: prompt }];
+      let finalText = null;
+      let attempts = 0;
+      const maxAttempts = 5; // Allow multiple tool use rounds
 
-      if (!resp.ok) {
-        const errText = await resp.text();
-        if (resp.status === 401) throw new Error("Ugyldig API-nøkkel. Sjekk innstillinger.");
-        if (resp.status === 429) throw new Error("For mange forespørsler. Vent litt og prøv igjen.");
-        throw new Error("API-feil (" + resp.status + "): " + errText.slice(0, 200));
+      while (attempts < maxAttempts) {
+        attempts++;
+
+        const resp = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 16000,
+            tools: [{ type: "web_search_20250305", name: "web_search" }],
+            messages: messages,
+          }),
+        });
+
+        if (!resp.ok) {
+          const errText = await resp.text();
+          if (resp.status === 401) throw new Error("Ugyldig API-nøkkel. Sjekk innstillinger.");
+          if (resp.status === 429) throw new Error("For mange forespørsler. Vent litt og prøv igjen.");
+          throw new Error("API-feil (" + resp.status + "): " + errText.slice(0, 200));
+        }
+
+        const data = await resp.json();
+
+        // Check if Claude wants to use more tools (stop_reason === "tool_use")
+        if (data.stop_reason === "tool_use") {
+          // Add assistant response and tool results to continue the conversation
+          messages.push({ role: "assistant", content: data.content });
+
+          // Build tool results for each tool use block
+          const toolResults = data.content
+            .filter(b => b.type === "web_search_tool_use" || b.type === "server_tool_use")
+            .map(b => ({
+              type: "tool_result",
+              tool_use_id: b.id,
+              content: "Search completed. Please continue processing the results.",
+            }));
+
+          if (toolResults.length > 0) {
+            messages.push({ role: "user", content: toolResults });
+          }
+          continue;
+        }
+
+        // Extract final text response
+        finalText = data.content
+          .filter(b => b.type === "text")
+          .map(b => b.text)
+          .join("\n");
+        break;
       }
 
-      const data = await resp.json();
-
-      // Extract text from all text blocks
-      const textBlocks = data.content
-        .filter(b => b.type === "text")
-        .map(b => b.text)
-        .join("\n");
+      if (!finalText) {
+        throw new Error("Kunne ikke hente innhold etter " + maxAttempts + " forsøk.");
+      }
 
       // Try to parse JSON from response
       try {
-        // Remove markdown code fences if present
-        const cleaned = textBlocks.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+        const cleaned = finalText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
         const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);
           return {
             title: parsed.title || "Uten tittel",
             author: parsed.author || null,
-            content: parsed.content || textBlocks,
+            content: parsed.content || finalText,
             type: type,
           };
         }
@@ -273,7 +307,7 @@ URL: ${url}`;
       return {
         title: "Uten tittel",
         author: null,
-        content: textBlocks,
+        content: finalText,
         type: type,
       };
     }
