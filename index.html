@@ -20,13 +20,18 @@
       min-height: 100vh;
       min-height: -webkit-fill-available;
       overscroll-behavior: none;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-right);
+      padding-right: env(safe-area-inset-left);
     }
     html { height: -webkit-fill-available; }
-    input { font-family: 'JetBrains Mono', monospace; }
-    input::placeholder { color: #3a3a5a; }
+    input, textarea { font-family: 'JetBrains Mono', monospace; }
+    input::placeholder, textarea::placeholder { color: #3a3a5a; }
 
     .app { padding: 0 20px 32px; max-width: 500px; margin: 0 auto; }
+
+    /* Header */
     .header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0 12px; }
     .header h1 { font-size: 22px; font-weight: 700; line-height: 1.2; }
     .header p { color: #4a4a6a; font-size: 12px; margin-top: 2px; }
@@ -36,48 +41,45 @@
       font-size: 16px; color: #6c63ff;
     }
 
-    .status-badges { display: flex; gap: 8px; padding-bottom: 16px; }
-    .badge {
-      font-size: 11px; padding: 3px 8px; border-radius: 6px;
-    }
+    /* Status badges */
+    .status-badges { display: flex; gap: 8px; padding-bottom: 16px; flex-wrap: wrap; }
+    .badge { font-size: 11px; padding: 3px 8px; border-radius: 6px; }
     .badge.on { background: rgba(46,204,113,0.1); color: #2ecc71; }
     .badge.off { background: rgba(255,68,68,0.1); color: #ff4444; }
     .badge.pending { background: rgba(255,170,0,0.1); color: #ffaa00; }
 
+    /* Input card */
     .input-card {
       background: #1a1a2e; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06); overflow: hidden;
     }
-    .input-label {
-      padding: 6px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
-      color: #4a4a6a; font-size: 12px;
-    }
+    .input-label { padding: 6px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #4a4a6a; font-size: 12px; }
     .input-row { display: flex; align-items: center; }
     .input-row input {
       flex: 1; padding: 14px 16px; border: none; outline: none; background: transparent;
       color: #e0e0e0; font-size: 15px;
     }
-    .clear-btn {
-      padding: 8px 12px; border: none; background: none; cursor: pointer;
-      color: #4a4a6a; font-size: 18px;
-    }
+    .clear-btn { padding: 8px 12px; border: none; background: none; cursor: pointer; color: #4a4a6a; font-size: 18px; }
 
+    /* Capture button */
     .capture-btn {
       width: 100%; padding: 16px; border-radius: 14px; border: none; cursor: pointer;
       font-size: 16px; font-weight: 700; font-family: 'DM Sans', sans-serif;
       transition: all 0.3s ease; margin-top: 16px;
     }
     .capture-btn.ready { background: linear-gradient(135deg, #6c63ff, #5a52d5); color: white; }
-    .capture-btn.disabled { background: linear-gradient(135deg, #2a2a4a, #1a1a3a); color: #4a4a6a; }
-    .capture-btn.loading { background: linear-gradient(135deg, #3a3a5a, #2a2a4a); color: white; opacity: 0.8; }
+    .capture-btn.disabled { background: linear-gradient(135deg, #2a2a4a, #1a1a3a); color: #4a4a6a; cursor: default; }
+    .capture-btn.loading { background: linear-gradient(135deg, #3a3a5a, #2a2a4a); color: white; opacity: 0.8; cursor: wait; }
 
     .type-hint { text-align: center; margin-top: 12px; font-size: 12px; }
 
+    /* Error box */
     .error-box {
       background: rgba(255,68,68,0.08); border-radius: 12px; border: 1px solid rgba(255,68,68,0.2);
       padding: 12px 16px; margin-top: 16px;
     }
     .error-box p { color: #ff6666; font-size: 13px; }
 
+    /* How it works */
     .howto {
       margin-top: 24px; padding: 16px; background: #12122a; border-radius: 14px;
       border: 1px solid rgba(255,255,255,0.04);
@@ -87,8 +89,8 @@
       letter-spacing: 0.05em; margin-bottom: 10px;
     }
     .howto-step { display: flex; align-items: flex-start; gap: 12px; margin-top: 8px; }
-    .howto-step span.icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-    .howto-step span.text { color: #6a6a8a; font-size: 13px; line-height: 1.4; }
+    .howto-step .icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .howto-step .text { color: #6a6a8a; font-size: 13px; line-height: 1.4; }
 
     /* Result view */
     .result-header { text-align: center; padding: 12px 0; }
@@ -99,9 +101,7 @@
       background: #1a1a2e; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);
       overflow: hidden; margin-top: 16px;
     }
-    .content-card-header {
-      padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
+    .content-card-header { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); }
     .content-card-header .meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .type-badge {
       color: white; font-size: 10px; font-weight: 700; padding: 2px 8px;
@@ -114,20 +114,15 @@
       color: #8888aa; font-size: 13px; line-height: 1.5;
     }
 
+    /* Action buttons */
     .action-btn {
       width: 100%; padding: 14px; border-radius: 14px; border: none; cursor: pointer;
-      font-size: 15px; font-weight: 600; font-family: 'DM Sans', sans-serif;
-      margin-top: 8px;
+      font-size: 15px; font-weight: 600; font-family: 'DM Sans', sans-serif; margin-top: 8px;
     }
     .action-btn.primary { background: linear-gradient(135deg, #6c63ff, #5a52d5); color: white; }
-    .action-btn.secondary {
-      background: transparent; border: 1px solid rgba(108,99,255,0.3); color: #6c63ff;
-    }
+    .action-btn.secondary { background: transparent; border: 1px solid rgba(108,99,255,0.3); color: #6c63ff; }
     .action-btn.secondary.copied { color: #2ecc71; border-color: rgba(46,204,113,0.3); }
-    .action-btn.ghost {
-      background: transparent; border: none; color: #666680; font-size: 14px;
-      padding: 12px;
-    }
+    .action-btn.ghost { background: transparent; border: none; color: #666680; font-size: 14px; padding: 12px; }
 
     /* Settings overlay */
     .overlay {
@@ -137,6 +132,7 @@
     .settings-panel {
       width: 100%; max-width: 28rem; margin: 0 16px 16px; border-radius: 16px;
       background: #1a1a2e; border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
+      max-height: 85vh; overflow-y: auto;
     }
     .settings-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -174,6 +170,8 @@
       border-radius: 50%; animation: spin 0.8s linear infinite;
       vertical-align: middle; margin-right: 8px;
     }
+
+    .version { text-align: center; padding: 24px 0 8px; color: #2a2a4a; font-size: 10px; }
   </style>
 </head>
 <body>
@@ -186,103 +184,96 @@
   <script type="text/babel">
     const { useState, useEffect, useRef, useCallback } = React;
 
+    const APP_VERSION = "1.1.0";
+
     // ─── URL Detection ───────────────────────────────────────
     function detectUrlType(url) {
       try {
         const u = new URL(url.trim());
         if (u.hostname.includes("youtube.com") || u.hostname.includes("youtu.be")) return "youtube";
-        if (u.pathname.endsWith(".pdf")) return "pdf";
+        if (u.pathname.toLowerCase().endsWith(".pdf")) return "pdf";
         return "article";
       } catch { return null; }
     }
 
-    function extractVideoId(url) {
-      try {
-        const u = new URL(url.trim());
-        if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
-        if (u.searchParams.has("v")) return u.searchParams.get("v");
-        if (u.pathname.includes("/embed/")) return u.pathname.split("/embed/")[1];
-        if (u.pathname.includes("/shorts/")) return u.pathname.split("/shorts/")[1];
-      } catch {}
-      return null;
-    }
+    // ─── Anthropic API — handles everything ──────────────────
+    async function extractContent(url, apiKey, type) {
+      let prompt;
 
-    // ─── API Calls ───────────────────────────────────────────
-    async function fetchYouTubeTranscript(url, apiKey) {
-      const videoId = extractVideoId(url);
-      if (!videoId) throw new Error("Could not extract video ID from URL");
+      if (type === "youtube") {
+        prompt = `I need you to get the transcript of this YouTube video. Use web_fetch to access the video page, then extract the complete transcript/captions text.
 
-      const resp = await fetch("https://www.youtube-transcript.io/api/transcripts", {
-        method: "POST",
-        headers: { "Authorization": "Basic " + apiKey, "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: [videoId] }),
-      });
+Return ONLY a JSON object (no markdown, no backticks, no commentary) with these fields:
+- "title": the video title
+- "author": the channel name
+- "content": the complete transcript text (all spoken words, cleaned up, no timestamps)
+- "duration": video duration if available
 
-      if (!resp.ok) {
-        const errText = await resp.text();
-        throw new Error("Transcript API error (" + resp.status + "): " + errText);
+URL: ${url}`;
+      } else {
+        prompt = `Fetch this web page and extract the main article content. Remove all navigation, ads, sidebars, footers, cookie banners, and boilerplate. Keep only the actual article text.
+
+Return ONLY a JSON object (no markdown, no backticks, no commentary) with these fields:
+- "title": the article/page title
+- "author": the author name if available, otherwise null
+- "content": the full article text
+- "published": publication date if available, otherwise null
+
+URL: ${url}`;
       }
 
-      const data = await resp.json();
-
-      if (Array.isArray(data) && data.length > 0) {
-        const entry = data[0];
-        const title = entry.title || "Unknown Title";
-        let transcript = "";
-
-        const segments = entry.tracks || entry.segments || [];
-        if (Array.isArray(segments) && segments.length > 0) {
-          if (segments[0]?.transcript) {
-            transcript = segments[0].transcript.map(s => s.text || s.value || "").join(" ");
-          } else {
-            transcript = segments.map(s => s.text || s.value || "").join(" ");
-          }
-        } else if (typeof entry.text === "string") {
-          transcript = entry.text;
-        } else if (typeof entry.transcript === "string") {
-          transcript = entry.transcript;
-        }
-
-        return { title, transcript, videoId, type: "youtube" };
-      }
-      throw new Error("Unexpected response format from Transcript API");
-    }
-
-    async function fetchArticleContent(url, apiKey) {
       const resp = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 4096,
+          max_tokens: 16000,
           tools: [{ type: "web_search_20250305", name: "web_search" }],
-          messages: [{
-            role: "user",
-            content: "Fetch the web page at this URL and extract the main article/content text. Remove all navigation, ads, sidebars, footers, and boilerplate. Return ONLY a JSON object with two fields: \"title\" (the article title) and \"content\" (the full article text). No markdown, no commentary. URL: " + url,
-          }],
+          messages: [{ role: "user", content: prompt }],
         }),
       });
 
       if (!resp.ok) {
         const errText = await resp.text();
-        throw new Error("Anthropic API error (" + resp.status + "): " + errText);
+        if (resp.status === 401) throw new Error("Ugyldig API-nøkkel. Sjekk innstillinger.");
+        if (resp.status === 429) throw new Error("For mange forespørsler. Vent litt og prøv igjen.");
+        throw new Error("API-feil (" + resp.status + "): " + errText.slice(0, 200));
       }
 
       const data = await resp.json();
-      const textBlocks = data.content.filter(b => b.type === "text").map(b => b.text).join("\n");
 
+      // Extract text from all text blocks
+      const textBlocks = data.content
+        .filter(b => b.type === "text")
+        .map(b => b.text)
+        .join("\n");
+
+      // Try to parse JSON from response
       try {
-        const jsonMatch = textBlocks.match(/\{[\s\S]*\}/);
+        // Remove markdown code fences if present
+        const cleaned = textBlocks.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]);
-          return { title: parsed.title || "Untitled Article", transcript: parsed.content || textBlocks, type: "article" };
+          return {
+            title: parsed.title || "Uten tittel",
+            author: parsed.author || null,
+            content: parsed.content || textBlocks,
+            type: type,
+          };
         }
       } catch {}
 
-      return { title: "Untitled Article", transcript: textBlocks, type: "article" };
+      // Fallback: use raw text
+      return {
+        title: "Uten tittel",
+        author: null,
+        content: textBlocks,
+        type: type,
+      };
     }
 
-    // ─── Format output ───────────────────────────────────────
+    // ─── Format output for Capture/ folder ───────────────────
     function formatOutput(result, sourceUrl) {
       const now = new Date().toISOString();
       return [
@@ -290,60 +281,60 @@
         "source_type: " + result.type,
         "source_url: " + sourceUrl,
         "source_title: " + result.title,
+        result.author ? "source_author: " + result.author : null,
         "captured_at: " + now,
-        "word_count: " + result.transcript.split(/\s+/).length,
-        result.videoId ? "video_id: " + result.videoId : null,
-        "---", "",
-        result.transcript,
+        "word_count: " + result.content.split(/\s+/).length,
+        "---",
+        "",
+        result.content,
       ].filter(Boolean).join("\n");
     }
 
     function generateFilename(result) {
       const date = new Date().toISOString().slice(0, 10);
-      const slug = (result.title || "untitled").toLowerCase().replace(/[^\w\s-]/g, "").replace(/[\s-]+/g, "_").slice(0, 60);
+      const slug = (result.title || "untitled")
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s-]+/g, "_")
+        .slice(0, 60);
       return date + "-" + slug + ".txt";
     }
 
-    // ─── Settings Component ──────────────────────────────────
+    // ─── Settings ────────────────────────────────────────────
     function Settings({ onClose }) {
-      const [anthropicKey, setAnthropicKey] = useState(localStorage.getItem("sb_anthropic_key") || "");
-      const [transcriptKey, setTranscriptKey] = useState(localStorage.getItem("sb_transcript_key") || "");
-      const [folderId, setFolderId] = useState(localStorage.getItem("sb_capture_folder_id") || "");
+      const [apiKey, setApiKey] = useState(localStorage.getItem("sb_api_key") || "");
+      const [folderId, setFolderId] = useState(localStorage.getItem("sb_folder_id") || "");
       const [saved, setSaved] = useState(false);
 
       const save = () => {
-        localStorage.setItem("sb_anthropic_key", anthropicKey.trim());
-        localStorage.setItem("sb_transcript_key", transcriptKey.trim());
-        localStorage.setItem("sb_capture_folder_id", folderId.trim());
+        localStorage.setItem("sb_api_key", apiKey.trim());
+        localStorage.setItem("sb_folder_id", folderId.trim());
         setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
+        setTimeout(() => { setSaved(false); onClose(); }, 1000);
       };
 
       return (
-        <div className="overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="overlay" onClick={e => e.target === e.currentTarget && onClose()}>
           <div className="settings-panel">
             <div className="settings-header">
-              <h2>Settings</h2>
-              <button className="done-btn" onClick={onClose}>Done</button>
+              <h2>Innstillinger</h2>
+              <button className="done-btn" onClick={onClose}>Ferdig</button>
             </div>
             <div className="settings-body">
               <div className="field">
-                <label>Anthropic API Key</label>
-                <p className="hint">For article extraction. Get one at console.anthropic.com</p>
-                <input value={anthropicKey} onChange={e => setAnthropicKey(e.target.value)} type="password" placeholder="sk-ant-..." />
+                <label>Anthropic API-nøkkel</label>
+                <p className="hint">Brukes for alt — YouTube og artikler. Hent fra console.anthropic.com</p>
+                <input value={apiKey} onChange={e => setApiKey(e.target.value)}
+                  type="password" placeholder="sk-ant-..." />
               </div>
               <div className="field">
-                <label>YouTube Transcript API Key</label>
-                <p className="hint">From youtube-transcript.io — free tier available</p>
-                <input value={transcriptKey} onChange={e => setTranscriptKey(e.target.value)} type="password" placeholder="your-api-token" />
-              </div>
-              <div className="field">
-                <label>Google Drive Capture Folder ID</label>
-                <p className="hint">The folder ID from your SecondBrain/Capture/ URL</p>
-                <input value={folderId} onChange={e => setFolderId(e.target.value)} placeholder="1kQNClS0JmPCK8..." />
+                <label>Google Drive Capture Mappe-ID</label>
+                <p className="hint">Fra URLen til SecondBrain/Capture/ i Google Drive (kommer snart)</p>
+                <input value={folderId} onChange={e => setFolderId(e.target.value)}
+                  placeholder="1kQNClS0JmPCK8..." />
               </div>
               <button className={"save-btn " + (saved ? "saved" : "normal")} onClick={save}>
-                {saved ? "✓ Saved" : "Save Settings"}
+                {saved ? "✓ Lagret" : "Lagre innstillinger"}
               </button>
             </div>
           </div>
@@ -351,14 +342,14 @@
       );
     }
 
-    // ─── Result Component ────────────────────────────────────
+    // ─── Result View ─────────────────────────────────────────
     function ResultView({ result, sourceUrl, onReset }) {
       const [copied, setCopied] = useState(false);
       const formatted = formatOutput(result, sourceUrl);
       const filename = generateFilename(result);
-      const wordCount = result.transcript.split(/\s+/).length;
+      const wordCount = result.content.split(/\s+/).length;
       const typeColor = result.type === "youtube" ? "#ff4444" : "#6c63ff";
-      const typeLabel = result.type === "youtube" ? "YouTube Transcript" : "Article";
+      const typeLabel = result.type === "youtube" ? "YouTube" : "Artikkel";
 
       const copyToClipboard = async () => {
         try {
@@ -366,6 +357,8 @@
         } catch {
           const ta = document.createElement("textarea");
           ta.value = formatted;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
           document.body.appendChild(ta);
           ta.select();
           document.execCommand("copy");
@@ -376,10 +369,14 @@
       };
 
       const downloadFile = () => {
-        const blob = new Blob([formatted], { type: "text/plain" });
+        const blob = new Blob([formatted], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = url; a.download = filename; a.click();
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
       };
 
@@ -387,27 +384,27 @@
         <div>
           <div className="result-header">
             <div className="check">✓</div>
-            <div className="label">Content extracted</div>
+            <div className="label">Innhold hentet</div>
           </div>
           <div className="content-card">
             <div className="content-card-header">
               <div className="meta">
                 <span className="type-badge" style={{backgroundColor: typeColor}}>{typeLabel}</span>
-                <span className="word-count">{wordCount.toLocaleString()} words</span>
+                <span className="word-count">{wordCount.toLocaleString()} ord</span>
               </div>
               <h3>{result.title}</h3>
             </div>
             <div className="content-preview">
-              {result.transcript.slice(0, 500)}{result.transcript.length > 500 && "..."}
+              {result.content.slice(0, 500)}{result.content.length > 500 ? "..." : ""}
             </div>
           </div>
-          <button className="action-btn primary" onClick={downloadFile} style={{marginTop: "16px"}}>
-            📥 Download as {filename}
+          <button className="action-btn primary" onClick={downloadFile} style={{marginTop: 16}}>
+            📥 Last ned {filename}
           </button>
           <button className={"action-btn secondary" + (copied ? " copied" : "")} onClick={copyToClipboard}>
-            {copied ? "✓ Copied to clipboard" : "📋 Copy to clipboard"}
+            {copied ? "✓ Kopiert" : "📋 Kopier til utklippstavle"}
           </button>
-          <button className="action-btn ghost" onClick={onReset}>← Capture another</button>
+          <button className="action-btn ghost" onClick={onReset}>← Fang en ny</button>
         </div>
       );
     }
@@ -420,49 +417,66 @@
       const [error, setError] = useState(null);
       const [showSettings, setShowSettings] = useState(false);
       const [urlType, setUrlType] = useState(null);
+      const inputRef = useRef(null);
 
-      const hasTranscriptKey = !!localStorage.getItem("sb_transcript_key");
-      const hasAnthropicKey = !!localStorage.getItem("sb_anthropic_key");
+      const hasApiKey = !!localStorage.getItem("sb_api_key");
+
+      // Auto-focus input on mount
+      useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, []);
 
       const processUrl = async (inputUrl) => {
         const trimmed = inputUrl.trim();
         if (!trimmed) return;
 
-        setStatus("detecting"); setError(null); setResult(null);
+        setStatus("detecting");
+        setError(null);
+        setResult(null);
+
         const type = detectUrlType(trimmed);
         setUrlType(type);
 
-        if (!type) { setError("Not a valid URL"); setStatus("error"); return; }
-        if (type === "youtube" && !hasTranscriptKey) {
-          setError("YouTube Transcript API key not configured. Tap ⚙ to add it.");
-          setStatus("error"); return;
+        if (!type) {
+          setError("Ikke en gyldig URL");
+          setStatus("error");
+          return;
         }
-        if (type === "article" && !hasAnthropicKey) {
-          setError("Anthropic API key not configured. Tap ⚙ to add it.");
-          setStatus("error"); return;
+
+        if (!hasApiKey) {
+          setError("API-nøkkel mangler. Trykk ⚙ for å legge den inn.");
+          setStatus("error");
+          return;
+        }
+
+        if (type === "pdf") {
+          setError("PDF-støtte kommer snart. Last ned PDFen og legg den direkte i Capture/.");
+          setStatus("error");
+          return;
         }
 
         setStatus("extracting");
+
         try {
-          let res;
-          if (type === "youtube") {
-            res = await fetchYouTubeTranscript(trimmed, localStorage.getItem("sb_transcript_key"));
-          } else if (type === "article") {
-            res = await fetchArticleContent(trimmed, localStorage.getItem("sb_anthropic_key"));
-          } else if (type === "pdf") {
-            setError("PDF extraction coming soon.");
-            setStatus("error"); return;
-          }
-          setResult(res); setStatus("done");
+          const apiKey = localStorage.getItem("sb_api_key");
+          const res = await extractContent(trimmed, apiKey, type);
+          setResult(res);
+          setStatus("done");
         } catch (err) {
-          setError(err.message); setStatus("error");
+          setError(err.message);
+          setStatus("error");
         }
       };
 
-      const reset = () => { setUrl(""); setStatus("idle"); setResult(null); setError(null); setUrlType(null); };
+      const reset = () => {
+        setUrl("");
+        setStatus("idle");
+        setResult(null);
+        setError(null);
+        setUrlType(null);
+        setTimeout(() => { if (inputRef.current) inputRef.current.focus(); }, 100);
+      };
 
-      const statusMsg = status === "detecting" ? "Detecting content type..." :
-        status === "extracting" ? (urlType === "youtube" ? "Extracting transcript..." : "Extracting article content...") : "";
+      const statusMsg = status === "detecting" ? "Oppdager innholdstype..." :
+        status === "extracting" ? (urlType === "youtube" ? "Henter transkripsjon..." : "Henter artikkelinnhold...") : "";
 
       return (
         <div className="app">
@@ -475,13 +489,10 @@
           </div>
 
           <div className="status-badges">
-            <span className={"badge " + (hasTranscriptKey ? "on" : "off")}>
-              {hasTranscriptKey ? "●" : "○"} YouTube
+            <span className={"badge " + (hasApiKey ? "on" : "off")}>
+              {hasApiKey ? "●" : "○"} Anthropic API
             </span>
-            <span className={"badge " + (hasAnthropicKey ? "on" : "off")}>
-              {hasAnthropicKey ? "●" : "○"} Articles
-            </span>
-            <span className="badge pending">◐ GDrive (soon)</span>
+            <span className="badge pending">◐ GDrive (snart)</span>
           </div>
 
           {status === "done" && result ? (
@@ -489,16 +500,18 @@
           ) : (
             <div>
               <div className="input-card">
-                <div className="input-label">Paste a URL to capture</div>
+                <div className="input-label">Lim inn en URL for å fange innhold</div>
                 <div className="input-row">
                   <input
+                    ref={inputRef}
                     value={url}
                     onChange={e => setUrl(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && processUrl(url)}
                     placeholder="https://youtube.com/watch?v=..."
-                    autoFocus
                   />
-                  {url && <button className="clear-btn" onClick={() => { setUrl(""); setError(null); setStatus("idle"); }}>✕</button>}
+                  {url && (
+                    <button className="clear-btn" onClick={() => { setUrl(""); setError(null); setStatus("idle"); }}>✕</button>
+                  )}
                 </div>
               </div>
 
@@ -507,28 +520,28 @@
                 onClick={() => processUrl(url)}
                 disabled={!url.trim() || status === "extracting" || status === "detecting"}>
                 {(status === "detecting" || status === "extracting")
-                  ? <span><span className="spinner"></span>{statusMsg}</span>
-                  : "Capture"}
+                  ? React.createElement("span", null, React.createElement("span", {className: "spinner"}), statusMsg)
+                  : "Fang innhold"}
               </button>
 
               {url.trim() && status === "idle" && (
                 <div className="type-hint">
-                  {detectUrlType(url.trim()) === "youtube" && <span style={{color:"#ff4444"}}>▶ YouTube — will extract transcript</span>}
-                  {detectUrlType(url.trim()) === "article" && <span style={{color:"#6c63ff"}}>📄 Article — will extract content</span>}
-                  {detectUrlType(url.trim()) === "pdf" && <span style={{color:"#ffaa00"}}>📑 PDF — coming soon</span>}
-                  {!detectUrlType(url.trim()) && <span style={{color:"#ff4444"}}>Not a valid URL</span>}
+                  {detectUrlType(url.trim()) === "youtube" && <span style={{color:"#ff4444"}}>▶ YouTube — henter transkripsjon</span>}
+                  {detectUrlType(url.trim()) === "article" && <span style={{color:"#6c63ff"}}>📄 Artikkel — henter innhold</span>}
+                  {detectUrlType(url.trim()) === "pdf" && <span style={{color:"#ffaa00"}}>📑 PDF — kommer snart</span>}
+                  {!detectUrlType(url.trim()) && <span style={{color:"#ff4444"}}>Ikke en gyldig URL</span>}
                 </div>
               )}
 
               {error && <div className="error-box"><p>{error}</p></div>}
 
               <div className="howto">
-                <h3>How it works</h3>
+                <h3>Slik fungerer det</h3>
                 {[
-                  ["📋", "Paste a URL from YouTube or any website"],
-                  ["⚡", "Content is extracted automatically"],
-                  ["💾", "Save the file to GDrive SecondBrain/Capture/"],
-                  ["🧠", "Second Brain processes it on next run"],
+                  ["📋", "Lim inn en URL fra YouTube eller en nettside"],
+                  ["⚡", "Innholdet hentes automatisk via Claude"],
+                  ["💾", "Last ned filen og legg den i GDrive Capture/"],
+                  ["🧠", "Second Brain prosesserer den ved neste kjøring"],
                 ].map(([icon, text], i) => (
                   <div className="howto-step" key={i}>
                     <span className="icon">{icon}</span>
@@ -539,12 +552,14 @@
             </div>
           )}
 
+          <div className="version">Second Brain Capture v{APP_VERSION}</div>
+
           {showSettings && <Settings onClose={() => setShowSettings(false)} />}
         </div>
       );
     }
 
-    ReactDOM.createRoot(document.getElementById("app")).render(<App />);
+    ReactDOM.createRoot(document.getElementById("app")).render(React.createElement(App));
   </script>
 </body>
 </html>
