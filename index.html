@@ -184,7 +184,7 @@
   <script type="text/babel">
     const { useState, useEffect, useRef, useCallback } = React;
 
-    const APP_VERSION = "1.4.0";
+    const APP_VERSION = "1.5.0";
 
     // ─── URL Detection ───────────────────────────────────────
     function detectUrlType(url) {
@@ -196,35 +196,30 @@
       } catch { return null; }
     }
 
-    // ─── YouTube: Supadata API ────────────────────────────────
-    async function fetchYouTubeTranscript(url, supadataKey) {
+    // ─── YouTube: TranscriptAPI.com ───────────────────────────
+    async function fetchYouTubeTranscript(url, transcriptApiKey) {
       const resp = await fetch(
-        "https://api.supadata.ai/v1/transcript?url=" + encodeURIComponent(url) + "&text=true",
-        { headers: { "x-api-key": supadataKey } }
+        "https://transcriptapi.com/api/v2/youtube/transcript?video_url=" + encodeURIComponent(url) + "&format=text&include_timestamp=false&send_metadata=true",
+        { headers: { "Authorization": "Bearer " + transcriptApiKey } }
       );
 
       if (!resp.ok) {
         const errText = await resp.text();
-        if (resp.status === 401) throw new Error("Ugyldig Supadata API-nøkkel. Sjekk innstillinger.");
-        if (resp.status === 404) throw new Error("Video ikke funnet eller er privat.");
+        if (resp.status === 401) throw new Error("Ugyldig TranscriptAPI-nøkkel. Sjekk innstillinger.");
+        if (resp.status === 404) throw new Error("Video ikke funnet eller har ingen undertekster.");
         if (resp.status === 429) throw new Error("For mange forespørsler. Vent litt.");
-        throw new Error("Supadata-feil (" + resp.status + "): " + errText.slice(0, 200));
+        throw new Error("TranscriptAPI-feil (" + resp.status + "): " + errText.slice(0, 200));
       }
 
       const data = await resp.json();
-      const transcript = typeof data.content === "string"
-        ? data.content
-        : Array.isArray(data.content)
-          ? data.content.map(s => s.text).join(" ")
-          : "";
+      const transcript = data.transcript || data.text || "";
 
       if (!transcript) throw new Error("Ingen transkripsjon funnet for denne videoen.");
 
       return {
-        title: data.title || "YouTube Video",
-        author: data.channel || null,
+        title: (data.metadata && data.metadata.title) || data.title || "YouTube Video",
+        author: (data.metadata && data.metadata.channel) || data.channel || null,
         content: transcript,
-        lang: data.lang || null,
         type: "youtube",
       };
     }
@@ -322,7 +317,7 @@ Return ONLY a JSON object (no markdown, no backticks, no commentary before or af
     // ─── Router ──────────────────────────────────────────────
     async function extractContent(url, keys, type) {
       if (type === "youtube") {
-        return fetchYouTubeTranscript(url, keys.supadata);
+        return fetchYouTubeTranscript(url, keys.transcript);
       } else {
         return fetchArticleContent(url, keys.anthropic);
       }
@@ -358,13 +353,13 @@ Return ONLY a JSON object (no markdown, no backticks, no commentary before or af
     // ─── Settings ────────────────────────────────────────────
     function Settings({ onClose }) {
       const [anthropicKey, setAnthropicKey] = useState(localStorage.getItem("sb_anthropic_key") || "");
-      const [supadataKey, setSupadataKey] = useState(localStorage.getItem("sb_supadata_key") || "");
+      const [transcriptKey, setTranscriptKey] = useState(localStorage.getItem("sb_transcript_key") || "");
       const [folderId, setFolderId] = useState(localStorage.getItem("sb_folder_id") || "");
       const [saved, setSaved] = useState(false);
 
       const save = () => {
         localStorage.setItem("sb_anthropic_key", anthropicKey.trim());
-        localStorage.setItem("sb_supadata_key", supadataKey.trim());
+        localStorage.setItem("sb_transcript_key", transcriptKey.trim());
         localStorage.setItem("sb_folder_id", folderId.trim());
         setSaved(true);
         setTimeout(() => { setSaved(false); onClose(); }, 1000);
@@ -379,10 +374,10 @@ Return ONLY a JSON object (no markdown, no backticks, no commentary before or af
             </div>
             <div className="settings-body">
               <div className="field">
-                <label>Supadata API-nøkkel (YouTube)</label>
-                <p className="hint">100 gratis transkripsjoner/mnd. Hent fra supadata.ai</p>
-                <input value={supadataKey} onChange={e => setSupadataKey(e.target.value)}
-                  type="password" placeholder="sd_..." />
+                <label>TranscriptAPI-nøkkel (YouTube)</label>
+                <p className="hint">100 gratis credits. Registrer deg på transcriptapi.com/signup</p>
+                <input value={transcriptKey} onChange={e => setTranscriptKey(e.target.value)}
+                  type="password" placeholder="sk_..." />
               </div>
               <div className="field">
                 <label>Anthropic API-nøkkel (Artikler)</label>
@@ -482,7 +477,7 @@ Return ONLY a JSON object (no markdown, no backticks, no commentary before or af
       const [urlType, setUrlType] = useState(null);
       const inputRef = useRef(null);
 
-      const hasSupadataKey = !!localStorage.getItem("sb_supadata_key");
+      const hasTranscriptKey = !!localStorage.getItem("sb_transcript_key");
       const hasAnthropicKey = !!localStorage.getItem("sb_anthropic_key");
 
       // Auto-focus input on mount
@@ -505,8 +500,8 @@ Return ONLY a JSON object (no markdown, no backticks, no commentary before or af
           return;
         }
 
-        if (type === "youtube" && !hasSupadataKey) {
-          setError("Supadata API-nøkkel mangler. Trykk ⚙ for å legge den inn.");
+        if (type === "youtube" && !hasTranscriptKey) {
+          setError("TranscriptAPI-nøkkel mangler. Trykk ⚙ for å legge den inn.");
           setStatus("error");
           return;
         }
@@ -527,7 +522,7 @@ Return ONLY a JSON object (no markdown, no backticks, no commentary before or af
 
         try {
           const keys = {
-            supadata: localStorage.getItem("sb_supadata_key"),
+            transcript: localStorage.getItem("sb_transcript_key"),
             anthropic: localStorage.getItem("sb_anthropic_key"),
           };
           const res = await extractContent(trimmed, keys, type);
@@ -562,8 +557,8 @@ Return ONLY a JSON object (no markdown, no backticks, no commentary before or af
           </div>
 
           <div className="status-badges">
-            <span className={"badge " + (hasSupadataKey ? "on" : "off")}>
-              {hasSupadataKey ? "●" : "○"} YouTube
+            <span className={"badge " + (hasTranscriptKey ? "on" : "off")}>
+              {hasTranscriptKey ? "●" : "○"} YouTube
             </span>
             <span className={"badge " + (hasAnthropicKey ? "on" : "off")}>
               {hasAnthropicKey ? "●" : "○"} Artikler
